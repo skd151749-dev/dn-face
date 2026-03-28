@@ -1,0 +1,49 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+2 0 obj
+<< /Length 645 >>
+stream
+BT
+/F1 10 Tf
+36 806 Td
+13 TL
+(DN FACE Attendance Report - Daily - ComE1 \(2026-03-27 to 2026-03-27\)) Tj
+T*
+(Total Users: 1 | Present: 1 | Late: 1 | Absent: 0) Tj
+T*
+() Tj
+T*
+(Date       | ID         | Name               | Group        | AM In    | AM St... | AM Out   | PM In    | PM St... | PM Out   | Overall  | Early...) Tj
+T*
+(---------------------------------------------------------------------------------------------------------------------------------------------------) Tj
+T*
+(2026-03-27 | stu001     | Student One        | ComE1        | 07:10:00 | On Time  | 11:31:00 | 14:10:00 | Late     | 17:02:00 | Late     | No      ) Tj
+T*
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+5 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000083 00000 n 
+0000000779 00000 n 
+0000000905 00000 n 
+0000000962 00000 n 
+trailer
+<< /Size 6 /Root 5 0 R >>
+startxref
+1011
+%%EOF
