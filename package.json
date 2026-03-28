@@ -1,0 +1,9 @@
+{
+  "name": "dn-face-project",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix frontend ci && npm --prefix frontend run build && node scripts/prepare-vercel.mjs"
+  }
+}

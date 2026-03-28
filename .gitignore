@@ -8,6 +8,7 @@ __pycache__/
 
 frontend/node_modules/
 frontend/dist/
+public/
 
 database/*.db
 database/*.sqlite

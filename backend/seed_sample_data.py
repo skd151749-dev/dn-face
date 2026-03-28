@@ -70,21 +70,65 @@ def ensure_attendance(db: Database):
         user_id = user["user_id"]
         group_name = user["group_name"]
 
-        if user_id == "eng_001":
-            db.record_checkin(user_id, today, "07:45:00", "Late", "Late", group_name=group_name)
-        else:
-            db.record_checkin(user_id, today, "06:50:00", "On Time", "On Time", group_name=group_name)
+        morning_status = "Late" if user_id == "eng_001" else "On Time"
+        afternoon_status = "Late" if user_id == "come2_001" else "On Time"
+
+        db.record_session_checkin(
+            user_id,
+            today,
+            session="morning",
+            time="07:45:00" if morning_status == "Late" else "06:50:00",
+            status="Present",
+            late_status=morning_status,
+            session_status=morning_status,
+            group_name=group_name,
+        )
+        today_row = db.get_attendance_today(user_id, today)
+        if today_row and not today_row.get("morning_check_out"):
+            db.record_session_checkout(today_row["id"], session="morning", time="11:35:00", early_leave="No")
+
+        db.record_session_checkin(
+            user_id,
+            today,
+            session="afternoon",
+            time="14:10:00" if afternoon_status == "Late" else "13:40:00",
+            status="Present",
+            late_status="Late" if morning_status == "Late" or afternoon_status == "Late" else "On Time",
+            session_status=afternoon_status,
+            group_name=group_name,
+        )
         today_row = db.get_attendance_today(user_id, today)
 
-        if user_id != "eng_001" and today_row and not today_row.get("check_out"):
-            db.record_checkout(today_row["id"], "17:05:00", "No")
+        if user_id != "eng_001" and today_row and not today_row.get("afternoon_check_out"):
+            db.record_session_checkout(today_row["id"], session="afternoon", time="17:05:00", early_leave="No")
 
         if not db.get_attendance_today(user_id, yesterday):
-            late_status = "Late" if user_id == "come2_001" else "On Time"
-            db.record_checkin(user_id, yesterday, "07:35:00" if late_status == "Late" else "06:55:00", late_status, late_status, group_name=group_name)
+            morning_history_status = "Late" if user_id == "come2_001" else "On Time"
+            db.record_session_checkin(
+                user_id,
+                yesterday,
+                session="morning",
+                time="07:35:00" if morning_history_status == "Late" else "06:55:00",
+                status="Present",
+                late_status=morning_history_status,
+                session_status=morning_history_status,
+                group_name=group_name,
+            )
             yesterday_row = db.get_attendance_today(user_id, yesterday)
             if yesterday_row:
-                db.record_checkout(yesterday_row["id"], "17:00:00", "No")
+                db.record_session_checkout(yesterday_row["id"], session="morning", time="11:30:00", early_leave="No")
+                db.record_session_checkin(
+                    user_id,
+                    yesterday,
+                    session="afternoon",
+                    time="13:35:00",
+                    status="Present",
+                    late_status=morning_history_status,
+                    session_status="On Time",
+                    group_name=group_name,
+                )
+                yesterday_row = db.get_attendance_today(user_id, yesterday)
+                db.record_session_checkout(yesterday_row["id"], session="afternoon", time="17:00:00", early_leave="No")
 
 
 def ensure_meals(db: Database):
@@ -108,7 +152,7 @@ def ensure_request(db: Database):
             "eng_001",
             "English Class",
             today,
-            attendance.get("check_in") if attendance else "07:45:00",
+            attendance.get("afternoon_check_in") if attendance else "14:10:00",
             "14:20:00",
             "Need to leave early for a family appointment.",
         )
@@ -126,9 +170,12 @@ def main():
     db = Database()
     db.save_settings(
         {
-            "check_in_start": "06:30",
-            "late_time": "07:30",
-            "check_out_time": "17:00",
+            "morning_check_in": "06:30",
+            "morning_late_after": "07:30",
+            "morning_check_out": "11:30",
+            "afternoon_check_in": "13:30",
+            "afternoon_late_after": "14:00",
+            "afternoon_check_out": "17:00",
         }
     )
     ensure_users(db)

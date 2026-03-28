@@ -1,5 +1,5 @@
 const ENV_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/$/, '')
-const BASE = ENV_BASE || (import.meta.env.PROD ? '' : 'http://localhost:8000')
+const BASE = ENV_BASE || (import.meta.env.PROD ? '/api' : 'http://localhost:8000')
 const GROUP_KEY = 'group'
 const TOKEN_KEY = 'dnface_token'
 const USER_KEY = 'dnface_user'
