@@ -91,7 +91,6 @@ def scan_attendance_with_strict_timing(
     if not embeddings:
         return {"matched": False, "action": "no_face", "message": "No face detected."}
 
-    # Strictly limit recognition to the selected section/group.
     if req.user_id:
         if not db.user_in_group(req.user_id, group):
             return {
@@ -143,8 +142,6 @@ def scan_attendance_with_strict_timing(
     user_payload = _scan_result_user(user, user_id, group)
     user_group = user.get("group_name") or group
 
-    # Morning first check-in: ALWAYS accept. Do not block because check-in has not "opened" yet.
-    # If the user's first scan is already in the afternoon period, treat it as afternoon check-in.
     if not existing or (not existing.get("morning_check_in") and not existing.get("afternoon_check_in")):
         session = "morning" if current_hhmm < rules["afternoon_check_in"] else "afternoon"
         late_after = rules["morning_late_after"] if session == "morning" else rules["afternoon_late_after"]
@@ -181,7 +178,6 @@ def scan_attendance_with_strict_timing(
             "attendance_state": serialize_attendance_state(updated),
         }
 
-    # Morning check-in exists: the next capture is checkout, but only at/after checkout time.
     if existing.get("morning_check_in") and not existing.get("morning_check_out"):
         if current_hhmm < rules["morning_check_out"]:
             return {
@@ -216,7 +212,6 @@ def scan_attendance_with_strict_timing(
             "attendance_state": serialize_attendance_state(updated),
         }
 
-    # Morning is complete. The next scan is the afternoon check-in.
     if existing.get("morning_check_out") and not existing.get("afternoon_check_in"):
         status = _session_status(current_hhmm, rules["afternoon_late_after"])
         overall_status = "Late" if status == "Late" or existing.get("late_status") == "Late" else "On Time"
@@ -252,7 +247,6 @@ def scan_attendance_with_strict_timing(
             "attendance_state": serialize_attendance_state(updated),
         }
 
-    # Afternoon check-in exists: checkout must wait for the configured checkout time.
     if existing.get("afternoon_check_in") and not existing.get("afternoon_check_out"):
         if current_hhmm < rules["afternoon_check_out"]:
             return {
@@ -299,8 +293,6 @@ def scan_attendance_with_strict_timing(
     }
 
 
-# Keep the rest of the backend API available under /api.
-# This mount comes after the custom scan route so the stricter hosted rule above wins.
 app.mount("/api", api_app)
 
 if MEDIA_DIR.exists():
@@ -329,3 +321,5 @@ def serve_frontend(full_path: str = ""):
             "message": "Frontend build not found. Run the root build step to generate the public site.",
         }
     )
+
+# deployment trigger: attendance timing fix
